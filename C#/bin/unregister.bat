@@ -1,0 +1,3 @@
+call "%SystemRoot%\Microsoft.NET\Framework\v4.0.30319\RegAsm.exe" /u "ClooWrapperVBA.dll"
+call "%SystemRoot%\Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe" /u "ClooWrapperVBA_x64.dll"
+set /p=Hit ENTER to continue...
