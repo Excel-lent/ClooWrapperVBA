@@ -45,7 +45,7 @@ The current version can be downloaded as:
 ## VBscript sample.
 **Good news**: Yes! It is also possible to use the wrapper also from VBscript!
 <br>
-**Bad news**: You can obtain only configuration of the platforms and devices. The reason: VBscript uses variants for arrays. Of course it is possible to use object or ArrayList to set the arrays, but this will make the wrapper much complicated and is out of the target of the wrapper.
+**Bad news**: You can obtain only configuration of the platforms and devices. The reason: VBscript uses variants for arrays. Of course it is possible to use object or ArrayList to set the arrays, but this will make the wrapper much complicated and is out of the scope of the wrapper.
 <br>
 
 ## Helpful VBA functions.
