@@ -26,7 +26,7 @@ Sub MainLoop()
     While Not allTasks_Completed
         For i = 1 To progDevices.Count
             If progDevices.Item(i).ProgramDevice.ExecutionCompleted Then
-                Call progDevices.Item(i).ProgramDevice.GetMemoryArgument_Double(0, vecResp)   ' Extract the results and do something with received data here.
+                result = progDevices.Item(i).ProgramDevice.GetMemoryArgument_Double(0, vecResp)    ' Extract the results and do something with received data here.
                 
                 wsAsynchronous.Cells(logLine, 1) = "Task " & currentTaskId(i) & ", " & progDevices.Item(i).ProgramDevice.deviceType & _
                     progDevices.Item(i).DeviceId & ": completed"
@@ -37,13 +37,13 @@ Sub MainLoop()
                 ' Start new task
                 If startedTasks < MAX_TASKS Then
                     ReDim vecResp(UBound(vecResp))  ' Erase output vector.
-                    Call progDevices.Item(i).ProgramDevice.SetMemoryArgument_Double(0, vecResp)
+                    result = progDevices.Item(i).ProgramDevice.SetMemoryArgument_Double(0, vecResp)
                     
                     ' If you want to use callbacks, than use function below
                     ' "CPU_Task_Completed" is a function that will obtain the callback.
                     ' Call progDevices.Item(i).ProgramDevice.ExecuteAsync(globalWorkOffset, globalWorkSize, localWorkSize, THREAD_PRIORITY, AddressOf Asynchronous.CPU_Task_Completed)
                     
-                    Call progDevices.Item(i).ProgramDevice.ExecuteBackground(globalWorkOffset, globalWorkSize, localWorkSize, THREAD_PRIORITY)
+                    result = progDevices.Item(i).ProgramDevice.ExecuteBackground(globalWorkOffset, globalWorkSize, localWorkSize, THREAD_PRIORITY)
                     startedTasks = startedTasks + 1
                     currentTaskId(i) = startedTasks
                 Else
@@ -71,6 +71,15 @@ Sub MainLoop()
     Wend
     
     wsAsynchronous.Cells(2, currentProgress).Interior.Color = RGB(255, 255, 255)
+    
+    For i = 1 To progDevices.Count
+        result = progDevices.Item(i).ProgramDevice.ReleaseMemObject(3)
+        result = progDevices.Item(i).ProgramDevice.ReleaseMemObject(2)
+        result = progDevices.Item(i).ProgramDevice.ReleaseMemObject(1)
+        result = progDevices.Item(i).ProgramDevice.ReleaseMemObject(0)
+        result = progDevices.Item(i).ProgramDevice.ReleaseKernel
+        result = progDevices.Item(i).ProgramDevice.ReleaseProgram
+    Next i
 End Sub
 
 Sub RunAsynchronous()
@@ -124,17 +133,17 @@ Sub RunAsynchronous()
     
     ReDim currentTaskId(progDevices.Count)
     For i = 1 To progDevices.Count
-        Call progDevices.Item(i).ProgramDevice.CreateKernel("DoubleMatrixMult")
-        Call progDevices.Item(i).ProgramDevice.SetMemoryArgument_Double(0, vecResp)
-        Call progDevices.Item(i).ProgramDevice.SetMemoryArgument_Double(1, vecM1)
-        Call progDevices.Item(i).ProgramDevice.SetMemoryArgument_Double(2, vecM2)
-        Call progDevices.Item(i).ProgramDevice.SetMemoryArgument_Long(3, vecQ)
+        result = progDevices.Item(i).ProgramDevice.CreateKernel("DoubleMatrixMult")
+        result = progDevices.Item(i).ProgramDevice.SetMemoryArgument_Double(0, vecResp)
+        result = progDevices.Item(i).ProgramDevice.SetMemoryArgument_Double(1, vecM1)
+        result = progDevices.Item(i).ProgramDevice.SetMemoryArgument_Double(2, vecM2)
+        result = progDevices.Item(i).ProgramDevice.SetMemoryArgument_Long(3, vecQ)
     Next i
     
     startedTasks = 0
     ' Start execution on all found devices almost simultaneously.
     For i = 1 To progDevices.Count
-        Call progDevices.Item(i).ProgramDevice.ExecuteBackground(globalWorkOffset, globalWorkSize, localWorkSize, THREAD_PRIORITY)
+        result = progDevices.Item(i).ProgramDevice.ExecuteBackground(globalWorkOffset, globalWorkSize, localWorkSize, THREAD_PRIORITY)
         
         ' If you want to use callbacks, than use function below
         ' "CPU_Task_Completed" is a function that will obtain the callback.

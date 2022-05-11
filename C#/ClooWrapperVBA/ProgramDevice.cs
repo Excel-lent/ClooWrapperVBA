@@ -1,7 +1,6 @@
 ﻿using Cloo;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -175,16 +174,42 @@ namespace ClooWrapperVBA
 
         #endregion GetArguments
 
+        #region Destructors
+
+        /// <summary>
+        /// Disposes kernel memory variable.
+        /// </summary>
+        /// <param name="argument_index">0-based index of argument in argument list.</param>
+        /// <returns>True, if the operation was successful, false otherwise.</returns>
+        [DispId(16)]
+        bool ReleaseMemObject(int argument_index);
+
+        /// <summary>
+        /// Disposes kernel.
+        /// </summary>
+        /// <returns>True, if the operation was successful, false otherwise.</returns>
+        [DispId(17)]
+        bool ReleaseKernel();
+
+        /// <summary>
+        /// Disposes ComputeProgram, ComputeCommandQueue and CommandQueue.
+        /// </summary>
+        /// <returns>True, if the operation was successful, false otherwise.</returns>
+        [DispId(18)]
+        bool ReleaseProgram();
+
+        #endregion Destructors
+
         /// <summary>
         /// Device type of used device ("GPU" / "CPU").
         /// </summary>
-        [DispId(16)]
+        [DispId(19)]
         string DeviceType { get; set; }
 
         /// <summary>
         /// Error string.
         /// </summary>
-        [DispId(17)]
+        [DispId(20)]
         string ErrorString { get; set; }
     }
 
@@ -193,7 +218,7 @@ namespace ClooWrapperVBA
     [ClassInterface(ClassInterfaceType.None)]
     public class ProgramDevice : IProgramDevice
     {
-        public ComputeProgram Prog;
+        public ComputeProgram ComputeProgram;
         public ComputeContext ComputeContext;
         public ComputeCommandQueue ComputeCommandQueue = null;
         private ComputeKernel kernel;
@@ -212,7 +237,7 @@ namespace ClooWrapperVBA
         {
             try
             {
-                kernel = Prog.CreateKernel(method);
+                kernel = ComputeProgram.CreateKernel(method);
                 variablePointers = new Dictionary<int, ComputeMemory>();
                 return true;
             }
@@ -272,11 +297,11 @@ namespace ClooWrapperVBA
                 return false;
             }
 
-            Prog = new ComputeProgram(ComputeContext, sourceCode);
+            ComputeProgram = new ComputeProgram(ComputeContext, sourceCode);
 
             try
             {
-                Prog.Build(null, options, null, IntPtr.Zero);
+                ComputeProgram.Build(null, options, null, IntPtr.Zero);
             }
             catch (Exception e)
             {
@@ -285,7 +310,7 @@ namespace ClooWrapperVBA
                 return false;
             }
 
-            buildLogs = Prog.GetBuildLog(ComputeContext.Devices[deviceTypeIndex]);
+            buildLogs = ComputeProgram.GetBuildLog(ComputeContext.Devices[deviceTypeIndex]);
 
             return true;
         }
@@ -295,7 +320,7 @@ namespace ClooWrapperVBA
         /// <summary>
         /// Writes an array of type "Long" to the device.
         /// </summary>
-        /// <param name="argument_index">The argument index.</param>
+        /// <param name="argument_index">0-based index of argument in argument list.</param>
         /// <param name="values">Array of "Long".</param>
         /// <returns>True, if the operation was successful, false otherwise.</returns>
         public bool SetMemoryArgument_Long(int argument_index, ref int[] values)
@@ -320,7 +345,7 @@ namespace ClooWrapperVBA
         /// <summary>
         /// Writes an array of type "Single" to the device.
         /// </summary>
-        /// <param name="argument_index">The argument index.</param>
+        /// <param name="argument_index">0-based index of argument in argument list.</param>
         /// <param name="values">Array of "Single".</param>
         /// <returns>True, if the operation was successful, false otherwise.</returns>
         public bool SetMemoryArgument_Single(int argument_index, ref float[] values)
@@ -345,7 +370,7 @@ namespace ClooWrapperVBA
         /// <summary>
         /// Writes an array of type "Double" to the device.
         /// </summary>
-        /// <param name="argument_index">The argument index.</param>
+        /// <param name="argument_index">0-based index of argument in argument list.</param>
         /// <param name="values">Array of "Double".</param>
         /// <returns>True, if the operation was successful, false otherwise.</returns>
         public bool SetMemoryArgument_Double(int argument_index, ref double[] values)
@@ -370,7 +395,7 @@ namespace ClooWrapperVBA
         /// <summary>
         /// Sets "Long" argument to the kernel.
         /// </summary>
-        /// <param name="argument_index">The argument index.</param>
+        /// <param name="argument_index">0-based index of argument in argument list.</param>
         /// <param name="value_long">Argument value as "Long".</param>
         /// <returns>True, if the operation was successful, false otherwise.</returns>
         public bool SetValueArgument_Long(int argument_index, int value_long)
@@ -395,7 +420,7 @@ namespace ClooWrapperVBA
         /// <summary>
         /// Sets "Single" argument to the kernel.
         /// </summary>
-        /// <param name="argument_index">The argument index.</param>
+        /// <param name="argument_index">0-based index of argument in argument list.</param>
         /// <param name="value_single">Argument value as "Single".</param>
         /// <returns>True, if the operation was successful, false otherwise.</returns>
         public bool SetValueArgument_Single(int argument_index, float value_single)
@@ -420,7 +445,7 @@ namespace ClooWrapperVBA
         /// <summary>
         /// Sets "Double" argument to the kernel.
         /// </summary>
-        /// <param name="argument_index">The argument index.</param>
+        /// <param name="argument_index">0-based index of argument in argument list.</param>
         /// <param name="value_double">Argument value as "Double".</param>
         /// <returns>True, if the operation was successful, false otherwise.</returns>
         public bool SetValueArgument_Double(int argument_index, double value_double)
@@ -587,10 +612,10 @@ namespace ClooWrapperVBA
         /// <summary>
         /// Reads an array of type "Long" from the device.
         /// </summary>
-        /// <param name="varIndex">0-based number of argument in argument list.</param>
+        /// <param name="argument_index">0-based index of argument in argument list.</param>
         /// <param name="values">Array of "Long".</param>
         /// <returns>False in case of error/exception. Otherwise true.</returns>
-        public bool GetMemoryArgument_Long(int varIndex, ref int[] values)
+        public bool GetMemoryArgument_Long(int argument_index, ref int[] values)
         {
             try
             {
@@ -599,7 +624,7 @@ namespace ClooWrapperVBA
                     fixed (int* p = (int[])values)
                     {
                         IntPtr ptr = (IntPtr)p;
-                        ComputeCommandQueue.Read((ComputeBuffer<int>)variablePointers[varIndex], true, 0L, values.Length, ptr, null);
+                        ComputeCommandQueue.Read((ComputeBuffer<int>)variablePointers[argument_index], true, 0L, values.Length, ptr, null);
                     }
                 }
                 return true;
@@ -615,10 +640,10 @@ namespace ClooWrapperVBA
         /// <summary>
         /// Reads an array of type "Single" from the device.
         /// </summary>
-        /// <param name="varIndex">0-based number of argument in argument list.</param>
+        /// <param name="argument_index">0-based index of argument in argument list.</param>
         /// <param name="values">Array of "Single".</param>
         /// <returns>False in case of error/exception. Otherwise true.</returns>
-        public bool GetMemoryArgument_Single(int varIndex, ref float[] values)
+        public bool GetMemoryArgument_Single(int argument_index, ref float[] values)
         {
             try
             {
@@ -627,7 +652,7 @@ namespace ClooWrapperVBA
                     fixed (float* p = (float[])values)
                     {
                         IntPtr ptr = (IntPtr)p;
-                        ComputeCommandQueue.Read((ComputeBuffer<float>)variablePointers[varIndex], true, 0L, values.Length, ptr, null);
+                        ComputeCommandQueue.Read((ComputeBuffer<float>)variablePointers[argument_index], true, 0L, values.Length, ptr, null);
                     }
                 }
                 return true;
@@ -643,10 +668,10 @@ namespace ClooWrapperVBA
         /// <summary>
         /// Reads an array of type "Double" from the device.
         /// </summary>
-        /// <param name="varIndex">0-based number of argument in argument list.</param>
+        /// <param name="argument_index">0-based index of argument in argument list.</param>
         /// <param name="values">Array of "Double".</param>
         /// <returns>False in case of error/exception. Otherwise true.</returns>
-        public bool GetMemoryArgument_Double(int varIndex, ref double[] values)
+        public bool GetMemoryArgument_Double(int argument_index, ref double[] values)
         {
             try
             {
@@ -655,7 +680,7 @@ namespace ClooWrapperVBA
                     fixed (double* p = (double[])values)
                     {
                         IntPtr ptr = (IntPtr)p;
-                        ComputeCommandQueue.Read((ComputeBuffer<double>)variablePointers[varIndex], true, 0L, values.Length, ptr, null);
+                        ComputeCommandQueue.Read((ComputeBuffer<double>)variablePointers[argument_index], true, 0L, values.Length, ptr, null);
                     }
                 }
                 return true;
@@ -669,6 +694,68 @@ namespace ClooWrapperVBA
         }
 
         #endregion GetArguments
+
+        #region Destructors
+
+        /// <summary>
+        /// Disposes kernel memory variable.
+        /// </summary>
+        /// <param name="argument_index">0-based index of argument in argument list.</param>
+        /// <returns>True, if the operation was successful, false otherwise.</returns>
+        public bool ReleaseMemObject(int argument_index)
+        {
+            try
+            {
+                variablePointers[argument_index].Dispose();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ErrorString += ex.Message;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Disposes kernel.
+        /// </summary>
+        /// <returns>True, if the operation was successful, false otherwise.</returns>
+        public bool ReleaseKernel()
+        {
+            try
+            {
+                kernel.Dispose();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ErrorString += ex.Message;
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Disposes ComputeProgram, ComputeCommandQueue and CommandQueue.
+        /// </summary>
+        /// <returns>True, if the operation was successful, false otherwise.</returns>
+        public bool ReleaseProgram()
+        {
+            try
+            {
+                ComputeProgram.Dispose();
+                ComputeCommandQueue.Dispose();
+                ComputeContext.Dispose();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                ErrorString += ex.Message;
+                return false;
+            }
+        }
+
+        #endregion Destructors
 
         /// <summary>
         /// Device type of initialized device ("GPU" / "CPU").

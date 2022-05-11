@@ -9,7 +9,7 @@ Sub VBA_PerformanceTest()
     Dim x1#(0), x2#(0), res#(0)
     Dim finalResults#()
     Dim i&, j&, k&, p&, q&, r&
-    Dim buildLogs$, sources$
+    Dim buildLogs$, sources$, result As Boolean
     Dim cTime As New CTimer
     Dim globalWorkSize&(1), localWorkSize&(), globalWorkOffset&()
     Dim calcCorrect As Boolean
@@ -71,26 +71,26 @@ Sub VBA_PerformanceTest()
         ' CPU calculations.
         Set programDevice_Performance = GetFirstDeviceOfType(progDevices, "CPU")
     
-        Call programDevice_Performance.CreateKernel("DoubleMatrixMult")
+        result = programDevice_Performance.CreateKernel("DoubleMatrixMult")
     
         globalWorkSize(0) = p
         globalWorkSize(1) = r
         vecQ(0) = q
     
-        Call programDevice_Performance.SetMemoryArgument_Double(0, vecResp)
-        Call programDevice_Performance.SetMemoryArgument_Double(1, vecM1)
-        Call programDevice_Performance.SetMemoryArgument_Double(2, vecM2)
-        Call programDevice_Performance.SetMemoryArgument_Long(3, vecQ)
+        result = programDevice_Performance.SetMemoryArgument_Double(0, vecResp)
+        result = programDevice_Performance.SetMemoryArgument_Double(1, vecM1)
+        result = programDevice_Performance.SetMemoryArgument_Double(2, vecM2)
+        result = programDevice_Performance.SetMemoryArgument_Long(3, vecQ)
     
         ' Start once to update cashes-
-        Call programDevice_Performance.ExecuteSync(globalWorkOffset, globalWorkSize, localWorkSize)
+        result = programDevice_Performance.ExecuteSync(globalWorkOffset, globalWorkSize, localWorkSize)
     
         ' Start real measurements.
         cTime.StartCounter
-        Call programDevice_Performance.ExecuteSync(globalWorkOffset, globalWorkSize, localWorkSize)
+        result = programDevice_Performance.ExecuteSync(globalWorkOffset, globalWorkSize, localWorkSize)
         wsPerformanceTest.Cells(3, 2) = cTime.TimeElapsed
     
-        Call programDevice_Performance.GetMemoryArgument_Double(0, vecResp)
+        result = programDevice_Performance.GetMemoryArgument_Double(0, vecResp)
         finalResults = VectorToMatrix(vecResp, p, r)
     
         ' Comparison to VBA result.
@@ -103,6 +103,13 @@ Sub VBA_PerformanceTest()
             Next j
         Next i
         wsPerformanceTest.Cells(3, 3) = calcCorrect
+        
+        result = programDevice_Performance.ReleaseMemObject(3)
+        result = programDevice_Performance.ReleaseMemObject(2)
+        result = programDevice_Performance.ReleaseMemObject(1)
+        result = programDevice_Performance.ReleaseMemObject(0)
+        result = programDevice_Performance.ReleaseKernel
+        result = programDevice_Performance.ReleaseProgram
     Else
         wsPerformanceTest.Cells(3, 2) = CVErr(2042)
         wsPerformanceTest.Cells(3, 3) = CVErr(2042)
@@ -112,27 +119,27 @@ Sub VBA_PerformanceTest()
     If Not (GetFirstDeviceOfType(progDevices, "GPU") Is Nothing) Then
         Set programDevice_Performance = GetFirstDeviceOfType(progDevices, "GPU")
         
-        Call programDevice_Performance.CreateKernel("DoubleMatrixMult")
+        result = programDevice_Performance.CreateKernel("DoubleMatrixMult")
         
         globalWorkSize(0) = p
         globalWorkSize(1) = r
         vecQ(0) = q
         
         ReDim vecResp(p * r - 1)
-        Call programDevice_Performance.SetMemoryArgument_Double(0, vecResp)
-        Call programDevice_Performance.SetMemoryArgument_Double(1, vecM1)
-        Call programDevice_Performance.SetMemoryArgument_Double(2, vecM2)
-        Call programDevice_Performance.SetMemoryArgument_Long(3, vecQ)
+        result = programDevice_Performance.SetMemoryArgument_Double(0, vecResp)
+        result = programDevice_Performance.SetMemoryArgument_Double(1, vecM1)
+        result = programDevice_Performance.SetMemoryArgument_Double(2, vecM2)
+        result = programDevice_Performance.SetMemoryArgument_Long(3, vecQ)
         
         ' Start once to update cashes-
         Call programDevice_Performance.ExecuteSync(globalWorkOffset, globalWorkSize, localWorkSize)
         
         ' Start real measurements.
         cTime.StartCounter
-        Call programDevice_Performance.ExecuteSync(globalWorkOffset, globalWorkSize, localWorkSize)
+        result = programDevice_Performance.ExecuteSync(globalWorkOffset, globalWorkSize, localWorkSize)
         wsPerformanceTest.Cells(4, 2) = cTime.TimeElapsed
         
-        Call programDevice_Performance.GetMemoryArgument_Double(0, vecResp)
+        result = programDevice_Performance.GetMemoryArgument_Double(0, vecResp)
         finalResults = VectorToMatrix(vecResp, p, r)
         
         ' Comparison to VBA result.
@@ -145,6 +152,12 @@ Sub VBA_PerformanceTest()
             Next j
         Next i
         wsPerformanceTest.Cells(4, 3) = calcCorrect
+        result = programDevice_Performance.ReleaseMemObject(3)
+        result = programDevice_Performance.ReleaseMemObject(2)
+        result = programDevice_Performance.ReleaseMemObject(1)
+        result = programDevice_Performance.ReleaseMemObject(0)
+        result = programDevice_Performance.ReleaseKernel
+        result = programDevice_Performance.ReleaseProgram
     Else
         wsPerformanceTest.Cells(4, 2) = CVErr(2042)
         wsPerformanceTest.Cells(4, 3) = CVErr(2042)
@@ -154,7 +167,7 @@ End Sub
 Sub GpuCpu_SingleDouble_PerformanceTest()
     Dim wsPerformanceTest As Worksheet
     Dim upper&, singles!(), doubles#(), aSingle!, aDouble#, i&
-    Dim sources$
+    Dim sources$, result As Boolean
     Dim progDevices As Collection
     Dim programDevice_Performance As ClooWrapperVBA.ProgramDevice
     
@@ -194,6 +207,11 @@ Sub GpuCpu_SingleDouble_PerformanceTest()
         wsPerformanceTest.Cells(4, 6) = GPU_PerformanceTest_Double(upper, doubles, aDouble, programDevice_Performance)
     End If
     
+    result = programDevice_Performance.ReleaseMemObject(1)
+    result = programDevice_Performance.ReleaseMemObject(0)
+    result = programDevice_Performance.ReleaseKernel
+    result = programDevice_Performance.ReleaseProgram
+    
     If GetFirstDeviceOfType(progDevices, "CPU") Is Nothing Then
         wsPerformanceTest.Cells(3, 5) = CVErr(2042)
         wsPerformanceTest.Cells(3, 6) = CVErr(2042)
@@ -202,52 +220,57 @@ Sub GpuCpu_SingleDouble_PerformanceTest()
         wsPerformanceTest.Cells(3, 5) = CPU_PerformanceTest_Single(upper, singles, aSingle, programDevice_Performance)
         wsPerformanceTest.Cells(3, 6) = CPU_PerformanceTest_Double(upper, doubles, aDouble, programDevice_Performance)
     End If
+    
+    result = programDevice_Performance.ReleaseMemObject(1)
+    result = programDevice_Performance.ReleaseMemObject(0)
+    result = programDevice_Performance.ReleaseKernel
+    result = programDevice_Performance.ReleaseProgram
 End Sub
 
 ' Single precision performance at GPU.
 Function GPU_PerformanceTest_Single(upper&, singles!(), aSingle!, programDevice_Performance As ClooWrapperVBA.ProgramDevice)
-    Dim buildLogs$
+    Dim buildLogs$, result As Boolean
     
-    Call programDevice_Performance.CreateKernel("SinglePerformance")
+    result = programDevice_Performance.CreateKernel("SinglePerformance")
     
-    Call programDevice_Performance.SetMemoryArgument_Single(0, singles)
-    Call programDevice_Performance.SetValueArgument_Single(1, aSingle)
+    result = programDevice_Performance.SetMemoryArgument_Single(0, singles)
+    result = programDevice_Performance.SetValueArgument_Single(1, aSingle)
     
     GPU_PerformanceTest_Single = PerformanceTestExecution(upper, programDevice_Performance)
 End Function
 
 ' Single precision performance at CPU.
 Function CPU_PerformanceTest_Single(upper&, singles!(), aSingle!, programDevice_Performance As ClooWrapperVBA.ProgramDevice)
-    Dim buildLogs$
+    Dim buildLogs$, result As Boolean
     
-    Call programDevice_Performance.CreateKernel("SinglePerformance")
+    result = programDevice_Performance.CreateKernel("SinglePerformance")
     
-    Call programDevice_Performance.SetMemoryArgument_Single(0, singles)
-    Call programDevice_Performance.SetValueArgument_Single(1, aSingle)
+    result = programDevice_Performance.SetMemoryArgument_Single(0, singles)
+    result = programDevice_Performance.SetValueArgument_Single(1, aSingle)
     
     CPU_PerformanceTest_Single = PerformanceTestExecution(upper, programDevice_Performance)
 End Function
 
 ' Double precision performance at GPU.
 Function GPU_PerformanceTest_Double(upper&, doubles#(), aDouble#, programDevice_Performance As ClooWrapperVBA.ProgramDevice)
-    Dim buildLogs$
+    Dim buildLogs$, result As Boolean
     
-    Call programDevice_Performance.CreateKernel("DoublePerformance")
+    result = programDevice_Performance.CreateKernel("DoublePerformance")
     
-    Call programDevice_Performance.SetMemoryArgument_Double(0, doubles)
-    Call programDevice_Performance.SetValueArgument_Double(1, aDouble)
+    result = programDevice_Performance.SetMemoryArgument_Double(0, doubles)
+    result = programDevice_Performance.SetValueArgument_Double(1, aDouble)
     
     GPU_PerformanceTest_Double = PerformanceTestExecution(upper, programDevice_Performance)
 End Function
 
 ' Double precision performance at CPU.
 Function CPU_PerformanceTest_Double(upper&, doubles#(), aDouble#, programDevice_Performance As ClooWrapperVBA.ProgramDevice)
-    Dim buildLogs$
+    Dim buildLogs$, result As Boolean
     
-    Call programDevice_Performance.CreateKernel("DoublePerformance")
+    result = programDevice_Performance.CreateKernel("DoublePerformance")
     
-    Call programDevice_Performance.SetMemoryArgument_Double(0, doubles)
-    Call programDevice_Performance.SetValueArgument_Double(1, aDouble)
+    result = programDevice_Performance.SetMemoryArgument_Double(0, doubles)
+    result = programDevice_Performance.SetValueArgument_Double(1, aDouble)
     
     CPU_PerformanceTest_Double = PerformanceTestExecution(upper, programDevice_Performance)
 End Function
