@@ -37,12 +37,12 @@ Function CreateDeviceCollection(sources$)
             
             If clooConfiguration.Platform.device.deviceType = "CPU" Then
                 result = progDevice.ProgramDevice.Build(sources, "", i - 1, j - 1, cpuCounter, buildLogs)
-                progDevice.DeviceId = cpuCounter
+                progDevice.deviceId = cpuCounter
                 progDevice.deviceType = "CPU"
                 If result = True Then cpuCounter = cpuCounter + 1
             ElseIf clooConfiguration.Platform.device.deviceType = "GPU" Then
                 result = progDevice.ProgramDevice.Build(sources, "", i - 1, j - 1, gpuCounter, buildLogs)
-                progDevice.DeviceId = gpuCounter
+                progDevice.deviceId = gpuCounter
                 progDevice.deviceType = "GPU"
                 If result = True Then gpuCounter = gpuCounter + 1
             Else

@@ -22,7 +22,7 @@ Name: "{app}\demo\cl"; Permissions: everyone-full
 Source: bin\ClooWrapperVBA.dll; DestDir: {app}; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;  
 Source: bin\ClooWrapperVBA_x64.dll; DestDir: {app}; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
 Source: bin\Cloo.dll; DestDir: {app}; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
-Source: ..\Excel\OpenCl v0.02.xlsm; DestDir: {app}\demo; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
+Source: ..\Excel\OpenCl v0.04.xlsm; DestDir: {app}\demo; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
 Source: ..\Excel\cl\Performance.cl; DestDir: {app}\demo\cl; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
 Source: ..\Excel\cl\MatrixMultiplication.cl; DestDir: {app}\demo\cl; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
 Source: ..\Excel\Configuration.vbs; DestDir: {app}\demo; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;

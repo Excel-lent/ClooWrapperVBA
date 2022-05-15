@@ -82,7 +82,7 @@ Sub VBA_PerformanceTest()
         result = programDevice_Performance.SetMemoryArgument_Double(2, vecM2)
         result = programDevice_Performance.SetMemoryArgument_Long(3, vecQ)
     
-        ' Start once to update cashes-
+        ' Start once to update cashes.
         result = programDevice_Performance.ExecuteSync(globalWorkOffset, globalWorkSize, localWorkSize)
     
         ' Start real measurements.
@@ -131,7 +131,7 @@ Sub VBA_PerformanceTest()
         result = programDevice_Performance.SetMemoryArgument_Double(2, vecM2)
         result = programDevice_Performance.SetMemoryArgument_Long(3, vecQ)
         
-        ' Start once to update cashes-
+        ' Start once to update cashes.
         Call programDevice_Performance.ExecuteSync(globalWorkOffset, globalWorkSize, localWorkSize)
         
         ' Start real measurements.
@@ -303,3 +303,112 @@ Function PerformanceTestExecution(upper&, programDevice_Performance)
     
     PerformanceTestExecution = (4096# * globalWorkSize(0) / elTime / 1000000000#)
 End Function
+
+Sub Test_OneAfterAnother()
+    Dim m1#(), m2#(), vecM1#(), vecM2#(), vecResp#(), resultVba#(), vecQ&(0)
+    Dim x1#(0), x2#(0), res#(0)
+    Dim finalResults#()
+    Dim i&, j&, k&, p&, q&, r&
+    Dim buildLogs$, sources$, result As Boolean
+    Dim cTime As New CTimer
+    Dim globalWorkSize&(1), localWorkSize&(), globalWorkOffset&()
+    Dim calcCorrect As Boolean
+    Dim programDevice_Performance As ClooWrapperVBA.ProgramDevice
+    Dim progDevices As Collection
+    
+    p = 2: q = 2: r = 2
+    
+    ReDim resultVba(p - 1, r - 1)
+    
+    ' Dimensions of matrices:
+    ReDim m1(p - 1, q - 1)
+    ReDim m2(q - 1, r - 1)
+    ReDim vecResp(p * r - 1)
+    
+    m1(0, 0) = 1: m1(0, 1) = 2: m1(1, 0) = 3: m1(1, 1) = 4
+    m2(0, 0) = 2: m2(0, 1) = 3: m2(1, 0) = 4: m2(1, 1) = 5
+    
+    vecM1 = MatrixToVector(m1, p, q)
+    vecM2 = MatrixToVector(m2, q, r)
+    
+    ' VBA matrix multiplication:
+    For i = 0 To p - 1
+        For j = 0 To r - 1
+            For k = 0 To q - 1
+                resultVba(i, j) = resultVba(i, j) + m1(i, k) * m2(k, j)
+            Next k
+        Next j
+    Next i
+    
+    Open Application.ActiveWorkbook.Path & "\cl\MatrixMultiplication.cl" For Binary As #1
+    sources = Space$(LOF(1))
+    Get #1, , sources
+    Close #1
+    
+    ' Adding of all CPU and GPU devices to collection.
+    Set progDevices = CreateDeviceCollection(sources)
+    
+    If progDevices Is Nothing Then
+        MsgBox ("No devices found! Something is wrong!")
+        Exit Sub
+    End If
+    
+    If Not (GetFirstDeviceOfType(progDevices, "CPU") Is Nothing) Then
+        ' CPU calculations.
+        Set programDevice_Performance = GetFirstDeviceOfType(progDevices, "CPU")
+    
+        result = programDevice_Performance.CreateKernel("DoubleMatrixMult")
+    
+        globalWorkSize(0) = p
+        globalWorkSize(1) = r
+        vecQ(0) = q
+    
+        result = programDevice_Performance.SetMemoryArgument_Double(0, vecResp)
+        result = programDevice_Performance.SetMemoryArgument_Double(1, vecM1)
+        result = programDevice_Performance.SetMemoryArgument_Double(2, vecM2)
+        result = programDevice_Performance.SetMemoryArgument_Long(3, vecQ)
+        
+        result = programDevice_Performance.ExecuteSync(globalWorkOffset, globalWorkSize, localWorkSize)
+        
+        result = programDevice_Performance.GetMemoryArgument_Double(0, vecResp)
+        finalResults = VectorToMatrix(vecResp, p, r)
+    
+        ' Comparison to VBA result.
+        calcCorrect = True
+        For i = 0 To p - 1
+            For j = 0 To r - 1
+                If Abs(finalResults(i, j) - resultVba(i, j)) > 1E-20 Then
+                    calcCorrect = False
+                End If
+            Next j
+        Next i
+        
+        
+        result = programDevice_Performance.SetMemoryArgument_Double(1, vecM2)
+        result = programDevice_Performance.SetMemoryArgument_Double(2, vecM1)
+        
+        result = programDevice_Performance.ExecuteSync(globalWorkOffset, globalWorkSize, localWorkSize)
+        result = programDevice_Performance.GetMemoryArgument_Double(0, vecResp)
+        finalResults = VectorToMatrix(vecResp, p, r)
+        
+        ' VBA matrix multiplication:
+        ReDim resultVba(p - 1, r - 1)
+        For i = 0 To p - 1
+            For j = 0 To r - 1
+                For k = 0 To q - 1
+                    resultVba(i, j) = resultVba(i, j) + m2(i, k) * m1(k, j)
+                Next k
+            Next j
+        Next i
+        
+        ' Comparison to VBA result.
+        calcCorrect = True
+        For i = 0 To p - 1
+            For j = 0 To r - 1
+                If Abs(finalResults(i, j) - resultVba(i, j)) > 1E-20 Then
+                    calcCorrect = False
+                End If
+            Next j
+        Next i
+    End If
+End Sub
