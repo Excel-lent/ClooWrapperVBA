@@ -1,4 +1,6 @@
 # COM-wrapper of [Cloo](https://github.com/clSharp/Cloo) to execute OpenCL code from Excel.
+[![Download ClooWrapperVBA](https://img.shields.io/sourceforge/dm/cloowrappervba.svg)](https://sourceforge.net/projects/cloowrappervba/files/latest/download)
+
 The wrapper allows to execute OpenCL code on CPU and GPU devices from VBA.
 More detailed description with examples can be found in [my CodeProject article](https://www.codeproject.com/Articles/5332060/How-to-Use-GPU-in-VBA-Excel).
 
