@@ -205,12 +205,12 @@ Sub GpuCpu_SingleDouble_PerformanceTest()
         Set programDevice_Performance = GetFirstDeviceOfType(progDevices, "GPU")
         wsPerformanceTest.Cells(4, 5) = GPU_PerformanceTest_Single(upper, singles, aSingle, programDevice_Performance)
         wsPerformanceTest.Cells(4, 6) = GPU_PerformanceTest_Double(upper, doubles, aDouble, programDevice_Performance)
+        
+        result = programDevice_Performance.ReleaseMemObject(1)
+        result = programDevice_Performance.ReleaseMemObject(0)
+        result = programDevice_Performance.ReleaseKernel
+        result = programDevice_Performance.ReleaseProgram
     End If
-    
-    result = programDevice_Performance.ReleaseMemObject(1)
-    result = programDevice_Performance.ReleaseMemObject(0)
-    result = programDevice_Performance.ReleaseKernel
-    result = programDevice_Performance.ReleaseProgram
     
     If GetFirstDeviceOfType(progDevices, "CPU") Is Nothing Then
         wsPerformanceTest.Cells(3, 5) = CVErr(2042)
@@ -219,12 +219,12 @@ Sub GpuCpu_SingleDouble_PerformanceTest()
         Set programDevice_Performance = GetFirstDeviceOfType(progDevices, "CPU")
         wsPerformanceTest.Cells(3, 5) = CPU_PerformanceTest_Single(upper, singles, aSingle, programDevice_Performance)
         wsPerformanceTest.Cells(3, 6) = CPU_PerformanceTest_Double(upper, doubles, aDouble, programDevice_Performance)
+        
+        result = programDevice_Performance.ReleaseMemObject(1)
+        result = programDevice_Performance.ReleaseMemObject(0)
+        result = programDevice_Performance.ReleaseKernel
+        result = programDevice_Performance.ReleaseProgram
     End If
-    
-    result = programDevice_Performance.ReleaseMemObject(1)
-    result = programDevice_Performance.ReleaseMemObject(0)
-    result = programDevice_Performance.ReleaseKernel
-    result = programDevice_Performance.ReleaseProgram
 End Sub
 
 ' Single precision performance at GPU.
