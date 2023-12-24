@@ -10,7 +10,7 @@ Const THREAD_PRIORITY = 0
 Dim progDevices As Collection
 Dim currentTaskId&()
 
-Dim vecResp#()
+Dim vecResp!()
 Dim wsAsynchronous As Worksheet
 Dim globalWorkSize&(1), localWorkSize&(), globalWorkOffset&()
 Dim logLine%
@@ -26,7 +26,7 @@ Sub MainLoop()
     While Not allTasks_Completed
         For i = 1 To progDevices.Count
             If progDevices.Item(i).ProgramDevice.ExecutionCompleted Then
-                result = progDevices.Item(i).ProgramDevice.GetMemoryArgument_Double(0, vecResp)    ' Extract the results and do something with received data here.
+                result = progDevices.Item(i).ProgramDevice.GetMemoryArgument_Single(0, vecResp)    ' Extract the results and do something with received data here.
                 
                 wsAsynchronous.Cells(logLine, 1) = "Task " & currentTaskId(i) & ", " & progDevices.Item(i).ProgramDevice.deviceType & _
                     progDevices.Item(i).DeviceId & ": completed"
@@ -37,7 +37,7 @@ Sub MainLoop()
                 ' Start new task
                 If startedTasks < MAX_TASKS Then
                     ReDim vecResp(UBound(vecResp))  ' Erase output vector.
-                    result = progDevices.Item(i).ProgramDevice.SetMemoryArgument_Double(0, vecResp)
+                    result = progDevices.Item(i).ProgramDevice.SetMemoryArgument_Single(0, vecResp)
                     
                     ' If you want to use callbacks, than use function below
                     ' "CPU_Task_Completed" is a function that will obtain the callback.
@@ -83,14 +83,14 @@ Sub MainLoop()
 End Sub
 
 Sub RunAsynchronous()
-    Dim vecM1#(), vecM2#()
+    Dim vecM1!(), vecM2!()
     Dim vecQ&(1)
     Dim i&, j&, p&, q&, r&, nRows&
     Dim buildLogs$, sources$
     
     Set wsAsynchronous = ThisWorkbook.Worksheets("Asynchronous")
     
-    Open Application.ActiveWorkbook.Path & "\cl\MatrixMultiplication.cl" For Binary As #1
+    Open Application.ActiveWorkbook.Path & "\cl\FloatMatrixMultiplication.cl" For Binary As #1
     sources = Space$(LOF(1))
     Get #1, , sources
     Close #1
@@ -133,10 +133,10 @@ Sub RunAsynchronous()
     
     ReDim currentTaskId(progDevices.Count)
     For i = 1 To progDevices.Count
-        result = progDevices.Item(i).ProgramDevice.CreateKernel("DoubleMatrixMult")
-        result = progDevices.Item(i).ProgramDevice.SetMemoryArgument_Double(0, vecResp)
-        result = progDevices.Item(i).ProgramDevice.SetMemoryArgument_Double(1, vecM1)
-        result = progDevices.Item(i).ProgramDevice.SetMemoryArgument_Double(2, vecM2)
+        result = progDevices.Item(i).ProgramDevice.CreateKernel("FloatMatrixMult")
+        result = progDevices.Item(i).ProgramDevice.SetMemoryArgument_Single(0, vecResp)
+        result = progDevices.Item(i).ProgramDevice.SetMemoryArgument_Single(1, vecM1)
+        result = progDevices.Item(i).ProgramDevice.SetMemoryArgument_Single(2, vecM2)
         result = progDevices.Item(i).ProgramDevice.SetMemoryArgument_Long(3, vecQ)
     Next i
     

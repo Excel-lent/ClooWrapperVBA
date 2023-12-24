@@ -82,5 +82,4 @@ The current version can be downloaded as:
         - Solution: Get OpenCL.dll from other computer.
     - Reason: The GPGPU / CPU drivers are too old and not supported by OpenCL.
         - Update the drivers.
-    - Regarding Xeon processors, it is recommended that you install the latest drivers, as detailed in the article "[OpenCL™ Drivers and Runtimes for Intel® Architecture](https://www.codeproject.com/Articles/1230011/OpenCL-Drivers-and-Runtimes-for-Intel-Architectu)".
 <br>

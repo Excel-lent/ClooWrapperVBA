@@ -37,12 +37,12 @@ Function CreateDeviceCollection(sources$)
             
             If clooConfiguration.Platform.device.deviceType = "CPU" Then
                 result = progDevice.ProgramDevice.Build(sources, "", i - 1, j - 1, cpuCounter, buildLogs)
-                progDevice.deviceId = cpuCounter
+                progDevice.DeviceId = cpuCounter
                 progDevice.deviceType = "CPU"
                 If result = True Then cpuCounter = cpuCounter + 1
             ElseIf clooConfiguration.Platform.device.deviceType = "GPU" Then
                 result = progDevice.ProgramDevice.Build(sources, "", i - 1, j - 1, gpuCounter, buildLogs)
-                progDevice.deviceId = gpuCounter
+                progDevice.DeviceId = gpuCounter
                 progDevice.deviceType = "GPU"
                 If result = True Then gpuCounter = gpuCounter + 1
             Else
@@ -62,7 +62,37 @@ Function CreateDeviceCollection(sources$)
     End If
 End Function
 
-Function MatrixToVector(m() As Double, maxi As Long, maxj As Long) As Double()
+Function MatrixToVectorSingle(m() As Single, maxi As Long, maxj As Long) As Single()
+    Dim v() As Single
+    Dim i&, j&
+    
+    ReDim v(maxi * maxj - 1)
+    
+    For i = 0 To maxi - 1
+        For j = 0 To maxj - 1
+            v(i + maxi * j) = m(i, j)
+        Next j
+    Next i
+    
+    MatrixToVectorSingle = v
+End Function
+
+Function VectorToMatrixSingle(v() As Single, maxi As Long, maxj As Long) As Single()
+    Dim i&, j&
+    Dim m() As Single
+    
+    ReDim m(maxi - 1, maxj - 1)
+    
+    For i = 0 To maxi - 1
+        For j = 0 To maxj - 1
+            m(i, j) = v(i + maxi * j)
+        Next j
+    Next i
+    
+    VectorToMatrixSingle = m
+End Function
+
+Function MatrixToVectorDouble(m() As Double, maxi As Long, maxj As Long) As Double()
     Dim v() As Double
     Dim i&, j&
     
@@ -74,10 +104,10 @@ Function MatrixToVector(m() As Double, maxi As Long, maxj As Long) As Double()
         Next j
     Next i
     
-    MatrixToVector = v
+    MatrixToVectorDouble = v
 End Function
 
-Function VectorToMatrix(v() As Double, maxi As Long, maxj As Long) As Double()
+Function VectorToMatrixDouble(v() As Double, maxi As Long, maxj As Long) As Double()
     Dim i&, j&
     Dim m() As Double
     
@@ -89,5 +119,5 @@ Function VectorToMatrix(v() As Double, maxi As Long, maxj As Long) As Double()
         Next j
     Next i
     
-    VectorToMatrix = m
+    VectorToMatrixDouble = m
 End Function

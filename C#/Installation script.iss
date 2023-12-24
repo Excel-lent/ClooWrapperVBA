@@ -3,7 +3,7 @@ AppName=ClooWrapperVBA
 AppVerName=ClooWrapperVBA
 DefaultDirName={pf}\ClooWrapperVBA
 DefaultGroupName=ClooWrapperVBA
-Compression=lzma
+Compression=zip
 SolidCompression=yes
 SourceDir=.\
 PrivilegesRequired=poweruser
@@ -22,9 +22,11 @@ Name: "{app}\demo\cl"; Permissions: everyone-full
 Source: bin\ClooWrapperVBA.dll; DestDir: {app}; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;  
 Source: bin\ClooWrapperVBA_x64.dll; DestDir: {app}; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
 Source: bin\Cloo.dll; DestDir: {app}; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
-Source: ..\Excel\OpenCl v0.05.xlsm; DestDir: {app}\demo; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
-Source: ..\Excel\cl\Performance.cl; DestDir: {app}\demo\cl; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
-Source: ..\Excel\cl\MatrixMultiplication.cl; DestDir: {app}\demo\cl; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
+Source: ..\Excel\OpenCl example.xlsm; DestDir: {app}\demo; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
+Source: ..\Excel\cl\FloatPerformance.cl; DestDir: {app}\demo\cl; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
+Source: ..\Excel\cl\DoublePerformance.cl; DestDir: {app}\demo\cl; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
+Source: ..\Excel\cl\FloatMatrixMultiplication.cl; DestDir: {app}\demo\cl; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
+Source: ..\Excel\cl\DoubleMatrixMultiplication.cl; DestDir: {app}\demo\cl; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
 Source: ..\Excel\Configuration.vbs; DestDir: {app}\demo; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
 Source: bin\register.bat; DestDir: {app}; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
 Source: bin\unregister.bat; DestDir: {app}; Flags: ignoreversion recursesubdirs overwritereadonly; Permissions: everyone-full;
