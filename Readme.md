@@ -78,6 +78,8 @@ The current version can be downloaded as:
 
 ## FAQ:
 1. Configuration: No platforms/devices were found.
+    - Reason: GPU is detected, Intel CPU not. 
+	    - Solution: [Install the OpenCL runtimes for CPU](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-cpu-runtime-for-opencl-applications-with-sycl-support.html). In my case (i5-1035G4), I had to download [2024.2 Release](https://registrationcenter-download.intel.com/akdlm/IRC_NAS/d9883ab0-0e26-47fd-9612-950b95460d72/w_opencl_runtime_p_2024.2.0.980.exe). 
     - Reason: OpenCL.dll is not found in "Windows" folder.
         - Solution: Get OpenCL.dll from other computer.
     - Reason: The GPGPU / CPU drivers are too old and not supported by OpenCL.
