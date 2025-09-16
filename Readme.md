@@ -85,6 +85,7 @@ The current version can be downloaded as:
     - Reason: The GPGPU / CPU drivers are too old and not supported by OpenCL.
         - Update the drivers.
 <br>
+
 ## SAST Tools
 
 [PVS-Studio](https://pvs-studio.com/pvs-studio/?utm_source=website&utm_medium=github&utm_campaign=open_source) - static analyzer for C, C++, C#, and Java code.
