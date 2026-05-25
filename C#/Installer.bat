@@ -1,0 +1,1 @@
+"C:\Program Files\WiX Toolset v6.0\bin\wix.exe" build ClooWrapperVBAInstaller.wxs -o ClooWrapperVBAInstaller.msi

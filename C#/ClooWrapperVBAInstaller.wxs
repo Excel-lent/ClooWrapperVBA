@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <Package
+           Name="ClooWrapperVBA"
+           Language="1033"
+           Version="1.0.0.0"
+           Manufacturer="ClooWrapperVBA"
+           UpgradeCode="{65A1D6FD-4D58-4EEA-A6AA-48D3A4BF78F9}"
+           InstallerVersion="300"
+           Compressed="yes"
+           Scope="perMachine">
+
+    <SummaryInformation Keywords="installer"
+                        Description="ClooWrapperVBA installer." />
+
+    <Media Id="1" Cabinet="product.cab" EmbedCab="yes" />
+	<StandardDirectory Id="ProgramFilesFolder">
+	  <Directory Id="INSTALLFOLDER" Name="ClooWrapperVBA" />
+	</StandardDirectory>
+
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+		<Component Id="Cmp_ClooWrapperVBA_dll" Guid="*">
+			<File Id="File_ClooWrapperVBA_dll"
+				  Source="bin\ClooWrapperVBA.dll"
+				  KeyPath="yes" />
+		</Component>
+		<Component Id="Cmp_ClooWrapperVBA_x64_dll" Guid="*">
+			<File Id="File_ClooWrapperVBA_x64_dll"
+				  Source="bin\ClooWrapperVBA_x64.dll"
+				  KeyPath="yes" />
+		</Component>
+		<Component Id="Cmp_Cloo_dll" Guid="*">
+			<File Id="File_Cloo_dll"
+				  Source="bin\Cloo.dll"
+				  KeyPath="yes" />
+		</Component>
+		<Component Id="Cmp_RegisterBat" Guid="*">
+			<File Id="File_RegisterBat"
+				  Source="bin\register.bat"
+				  KeyPath="yes" />
+		</Component>
+		<Component Id="Cmp_UnregisterBat" Guid="*">
+			<File Id="File_UnregisterBat"
+				  Source="bin\unregister.bat"
+				  KeyPath="yes" />
+		</Component>
+		<Component Id="Cmp_Demo_Xlsm" Guid="*">
+			<File Id="File_OpenClExampleXlsm"
+				  Source="..\Excel\OpenCl example.xlsm"
+				  KeyPath="yes" />
+		</Component>
+		<Component Id="Cmp_Demo_ConfigVbs" Guid="*">
+			<File Id="File_ConfigurationVbs"
+				  Source="..\Excel\Configuration.vbs"
+				  KeyPath="yes" />
+		</Component>
+		<Component Id="Cmp_FloatPerformance_cl" Guid="*">
+		  <File Id="File_FloatPerformance_cl"
+				Source="..\Excel\cl\FloatPerformance.cl"
+				KeyPath="yes" />
+		</Component>
+		<Component Id="Cmp_DoublePerformance_cl" Guid="*">
+		  <File Id="File_DoublePerformance_cl"
+				Source="..\Excel\cl\DoublePerformance.cl"
+				KeyPath="yes" />
+		</Component>
+		<Component Id="Cmp_FloatMatrixMultiplication_cl" Guid="*">
+		  <File Id="File_FloatMatrixMultiplication_cl"
+				Source="..\Excel\cl\FloatMatrixMultiplication.cl"
+				KeyPath="yes" />
+		</Component>
+		<Component Id="Cmp_DoubleMatrixMultiplication_cl" Guid="*">
+		  <File Id="File_DoubleMatrixMultiplication_cl"
+				Source="..\Excel\cl\DoubleMatrixMultiplication.cl"
+				KeyPath="yes" />
+		</Component>
+      <Component Id="Cmp_RemoveGeneratedTlbs" Guid="*">
+        <CreateFolder />
+        <RemoveFile Id="Remove_ClooWrapperVBA_tlb"
+                    Name="ClooWrapperVBA.tlb"
+                    On="uninstall" />
+        <RemoveFile Id="Remove_ClooWrapperVBA_x64_tlb"
+                    Name="ClooWrapperVBA_x64.tlb"
+                    On="uninstall" />
+        <RegistryValue Root="HKLM"
+                       Key="SOFTWARE\ClooWrapperVBA"
+                       Name="Installed"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+<CustomAction Id="RegisterComX86"
+              Directory="INSTALLFOLDER"
+              ExeCommand="[WindowsFolder]Microsoft.NET\Framework\v4.0.30319\RegAsm.exe /codebase /tlb ClooWrapperVBA.dll"
+              Execute="deferred"
+              Return="check"
+              Impersonate="no" />
+<CustomAction Id="RegisterComX64"
+              Directory="INSTALLFOLDER"
+              ExeCommand="[WindowsFolder]Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe /codebase /tlb ClooWrapperVBA_x64.dll"
+              Execute="deferred"
+              Return="check"
+              Impersonate="no" />
+<CustomAction Id="UnregisterComX86"
+              Directory="INSTALLFOLDER"
+              ExeCommand="[WindowsFolder]Microsoft.NET\Framework\v4.0.30319\RegAsm.exe /unregister ClooWrapperVBA.dll"
+              Execute="deferred"
+              Return="check"
+              Impersonate="no" />
+<CustomAction Id="UnregisterComX64"
+              Directory="INSTALLFOLDER"
+              ExeCommand="[WindowsFolder]Microsoft.NET\Framework64\v4.0.30319\RegAsm.exe /unregister ClooWrapperVBA_x64.dll"
+              Execute="deferred"
+              Return="check"
+              Impersonate="no" />
+
+<InstallExecuteSequence>
+  <Custom Action="RegisterComX86" After="InstallFiles" Condition="NOT Installed" />
+  <Custom Action="RegisterComX64" After="InstallFiles" Condition="NOT Installed AND VersionNT64" />
+  <Custom Action="UnregisterComX86" Before="RemoveFiles" Condition="REMOVE~=&quot;ALL&quot;" />
+  <Custom Action="UnregisterComX64" Before="RemoveFiles" Condition="REMOVE~=&quot;ALL&quot; AND VersionNT64" />
+</InstallExecuteSequence>
+
+    <Feature Id="MainFeature" Title="ClooWrapperVBA" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+
+  </Package>
+</Wix>

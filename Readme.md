@@ -11,8 +11,8 @@ The wrapper has simple implementation and divided in two independent parts:
 
 ## Downloads
 The current version can be downloaded as:
-* [Installer for Windows](https://sourceforge.net/projects/cloowrappervba/files/ClooWrapperVBA%20setup.exe/download). Installation path is "C:\Program Files (x86)\ClooWrapperVBA\".
-* [Zip-file which contains the same content as the installer](https://sourceforge.net/projects/cloowrappervba/files/ClooWrapperVBA.zip/download). The components must be registered using "register.bat". Please note, that the "register.bat" must be started with admin rights.
+* [Installer for Windows](https://sourceforge.net/projects/cloowrappervba/files/v1.0.0/ClooWrapperVBAInstaller.msi/download). Installation path is "C:\Program Files (x86)\ClooWrapperVBA\".
+* [Zip-file which contains the same content as the installer](https://sourceforge.net/projects/cloowrappervba/files/v1.0.0/ClooWrapperVBA.zip/download). The components must be registered using "register.bat". Please note, that the "register.bat" must be started with admin rights.
 
 <p style='text-align:justify'>Directory "demo" contains the Excel table with all demos and VBscript file to check available platforms and devices even without Excel.</p>
 <br>
